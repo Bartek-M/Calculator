@@ -175,7 +175,7 @@ class Calculator(tk.Frame):
         tk.Button(self, text="9", **DEFAULT_BTN(9), command=lambda: self.click("9")).grid(row=4, column=2)
 
         tk.Button(self, text="%", **DEFAULT_BTN(12), command=lambda: self.click(" % ")).grid(row=3, column=0)
-        tk.Button(self, text="x" "\u00B2", **DEFAULT_BTN(13), command=lambda: self.click("\u00B2")).grid(row=3, column=1)
+        tk.Button(self, text="x" "\u00B2", **DEFAULT_BTN(13), command=lambda: self.click("\u00B2 ")).grid(row=3, column=1)
         tk.Button(self, text="xʸ", **DEFAULT_BTN(14), command=lambda: self.click(" ^ ")).grid(row=3, column=2)
 
         tk.Button(self, text="AC", **DEFAULT_BTN(20), command=lambda: self.click("AC")).grid(row=2, column=0)
@@ -241,6 +241,9 @@ class Calculator(tk.Frame):
         self.equal = False
 
     def equal_to(self):
+        if self.brackets:
+            return
+
         self.text_2["text"] = f"{self.text['text']} ="
 
         try:
@@ -261,24 +264,6 @@ class Calculator(tk.Frame):
 
         if last_char in ["(", ")"]:
             self.brackets = False
-
-    def change_symbols(self, btn_id):
-        x = "+", "-", "*", "/", "%", "."
-        X = " + ", " - ", " * ", " / ", " % ", "."
-        l1 = self.text["text"]
-        l2 = l1.replace(" ", "")
-        l3 = l2[:-1]
-        length = len(l2)
-        last_char = l2[length - 1]
-        if last_char in x:
-            if btn_id in X:
-                self.text["text"] = l3.replace("+", " + ").replace("*", " * ").replace("-", " - ").replace("/", " / ").replace("%", "% ")
-                self.text["text"] += btn_id
-        elif last_char == "\u00B2":
-            if btn_id in X:
-                self.text["text"] += btn_id
-        else:
-            self.text["text"] += btn_id
 
     def change_color(self, btn_id):
         if btn_id == "3.14":
@@ -338,11 +323,19 @@ class Calculator(tk.Frame):
 
             self.set_text(self.text, btn_id, btn_id == ".")
         elif self.equal:
-            self.set_text(self.text, btn_id, btn_id in x)
+            self.set_text(self.text, btn_id, btn_id in self.SYMBOLS)
             self.equal = False
         else:
-            if btn_id in self.SYMBOLS:
-                return self.change_symbols(btn_id)
+            if temp_id in self.SYMBOLS:
+                last_char = self.text["text"][-1 if self.text["text"][-1] != " " else -2]
+                new_text, add = btn_id, True
+                
+                if last_char in ["\u00B2", "√"]:
+                    new_text, add = self.text["text"][:-2] + btn_id, False
+                elif last_char in self.SYMBOLS:
+                    new_text, add = self.text["text"][:-3] + btn_id, False
+
+                return self.set_text(self.text, new_text, add)
             
             if self.text["text"][-1] == ")" and btn_id not in self.SYMBOLS:
                 return self.set_text(self.text, f" * {btn_id}", True)
