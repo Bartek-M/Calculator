@@ -3,10 +3,6 @@ import tkinter as tk
 import tkinter.font as font
 from tkinter import colorchooser
 
-dict1 = {}  # Brackets
-dict2 = {}  # Equal to
-dict3 = {}  # Symbol
-
 
 class Calculator(tk.Frame):
     BG_DEFAULT = [
@@ -70,15 +66,34 @@ class Calculator(tk.Frame):
     WIDTH = 6
     WIDTH_2 = 7
 
-    MAX_LENGTH = 11
+    MAX_LENGTH = 13
 
-    SYMBOLS = {"( )": 10, ".": 11, "%": 12, "\u00B2": 13, "^": 14, "+": 15, "-": 16, "*": 17, "/": 18, "B": 19, "": 20, "√": 21, "3.14": 22, "t": 24, "=": 25}
+    SYMBOLS = {
+        "( )": 10,
+        ".": 11,
+        "%": 12,
+        "\u00B2": 13,
+        "^": 14,
+        "+": 15,
+        "-": 16,
+        "*": 17,
+        "/": 18,
+        "B": 19,
+        "AC": 20,
+        "√": 21,
+        "3.14": 22,
+        "t": 24,
+        "=": 25,
+    }
 
     def __init__(self, master):
         super().__init__(master)
         self.colors = self.load_colors()
 
         self.config = None  # None | "bg" | "fg"
+
+        self.brackets = False
+        self.equal = False
 
         self.grid()
         self.create_widget()
@@ -164,7 +179,7 @@ class Calculator(tk.Frame):
         tk.Button(self, text="x" "\u00B2", **DEFAULT_BTN(13), command=lambda: self.click("\u00B2")).grid(row=3, column=1)
         tk.Button(self, text="xʸ", **DEFAULT_BTN(14), command=lambda: self.click(" ^ ")).grid(row=3, column=2)
 
-        tk.Button(self, text="AC", **DEFAULT_BTN(20), command=lambda: self.click(" ")).grid(row=2, column=0)
+        tk.Button(self, text="AC", **DEFAULT_BTN(20), command=lambda: self.click("AC")).grid(row=2, column=0)
         tk.Button(self, text="√", **DEFAULT_BTN(21), command=lambda: self.click("√ ")).grid(row=2, column=1)
         tk.Button(self, text="π", **DEFAULT_BTN(22), command=lambda: self.click("3.14")).grid(row=2, column=2)
 
@@ -175,17 +190,14 @@ class Calculator(tk.Frame):
         tk.Button(self, text="/", **DEFAULT_BTN(18) | {"width": self.WIDTH_2}, command=lambda: self.click(" / ")).grid(row=3, column=3)
         tk.Button(self, text="\u232B", **DEFAULT_BTN(19) | {"width": self.WIDTH_2}, command=lambda: self.click("B")).grid(row=2, column=3)
 
-    def set_text(self, label, text):
-        if len(text) > self.MAX_LENGTH:
+    def set_text(self, label, text="", add: bool = False):
+        if len(text) > self.MAX_LENGTH or (add and (len(label["text"]) + len(text) > self.MAX_LENGTH)):
             return
 
-        label["text"] = text
-
-    def enter_down(self, _):
-        self.click("=")
-
-    def backspace_down(self, _):
-        self.backspace()
+        if add:
+            label["text"] += text
+        else:
+            label["text"] = text
 
     def key_up(self, e):
         match char := e.char, self.config:
@@ -211,26 +223,23 @@ class Calculator(tk.Frame):
             case "p", _:
                 char = "3.14"
 
-        if char.strip() not in self.SYMBOLS or (char.isdigit() and int(char) not in range(0, 10)):
+        if not char or (char.strip() not in self.SYMBOLS and (not char.isdigit() or int(char) not in range(0, 10))):
             return
 
         self.click(char)
 
-    def delete(self, _):
-        self.AC()
+    def enter_down(self, _):
+        self.click("=")
 
-    def bracket(self, _):
+    def bracket_down(self, _):
         self.click("( )")
 
-    def AC(self):
-        self.text["text"] = "0"
-        self.text_2["text"] = ""
-        if "a" in dict1:
-            del dict1["a"]
-        if "a" in dict2:
-            del dict2["a"]
-        if "a" in dict3:
-            del dict3["a"]
+    def all_clear(self, _=None):
+        self.set_text(self.text, "0")
+        self.set_text(self.text_2)
+
+        self.brackets = False
+        self.equal = False
 
     def equal_to(self):
         self.text_2["text"] = f"{self.text['text']} ="
@@ -243,27 +252,18 @@ class Calculator(tk.Frame):
 
         dict2["a"] = "b"
 
-    def backspace(self):
-        x = "+", "-", "*", "\u00B2", "/", "%", "^", "√", "."
-        l1 = self.text["text"]
-        l2 = l1.replace(" ", "")
-        l3 = l2[:-1]
-        length = len(l2)
-        last_char = l2[length - 1]
-        self.text["text"] = l3.replace("+", " + ").replace("*", " * ").replace("-", " - ").replace("/", " / ").replace("^", " ^ ").replace("√", "√ ")
-        if self.text["text"] == "":  # Never blank label text
-            self.text["text"] = "0"
-            self.text_2["text"] = ""
-        if last_char in x:
-            if "a" in dict3:
-                del dict3["a"]
-        elif last_char == "(":
-            if "a" in dict1:
-                del dict1["a"]
-        elif last_char == ")":
-            dict1["a"] = "b"
+    def backspace(self, _=None):
+        last_char = self.text["text"][-1]
+        self.text["text"] = self.text["text"][: -3 if last_char == " " else -1]
 
-    def change(self, btn_id):
+        if self.text["text"] == "":  # Never blank label text
+            self.set_text(self.text, "0")
+            self.set_text(self.text_2)
+
+        if last_char in ["(", ")"]:
+            self.brackets = False
+
+    def change_symbols(self, btn_id):
         x = "+", "-", "*", "/", "%", "."
         X = " + ", " - ", " * ", " / ", " % ", "."
         l1 = self.text["text"]
@@ -278,8 +278,6 @@ class Calculator(tk.Frame):
         elif last_char == "\u00B2":
             if btn_id in X:
                 self.text["text"] += btn_id
-            else:
-                return
         else:
             self.text["text"] += btn_id
 
@@ -302,24 +300,24 @@ class Calculator(tk.Frame):
 
     def click(self, btn_id):
         if self.config in ["bg", "fg"]:
-            self.change_color(btn_id.strip())
+            return self.change_color(btn_id.strip())
+
+        if self.text["text"] == "ERROR" and btn_id != "AC":
             return
 
-        if btn_id == " ":  # All Clear
-            self.AC()
+        if btn_id == "AC":
+            return self.all_clear()
+        if btn_id == "=":
+            return self.equal_to()
+        if btn_id == "B":
+            return self.backspace()
 
-        elif btn_id == "=":  # Equal To
-            self.equal_to()
-
-        elif btn_id == "B":  # BackSpace
-            self.backspace()
-
-        elif btn_id == "( )":
+        if btn_id == "( )":
             x = "+", "-", "*", "\u00B2", "/", "%", "^"
+
             if "a" in dict1:
                 self.text["text"] += ")"
-                if "a" in dict1:
-                    del dict1["a"]
+                del dict1["a"]
             else:
                 if self.text["text"] == "0":
                     self.text["text"] = "("
@@ -336,45 +334,37 @@ class Calculator(tk.Frame):
                 if "a" in dict2:
                     del dict2["a"]
 
-        else:  # Text
-            x = " * ", "\u00B2", " / ", " % ", ".", " ^ ", "√ ", " + ", " - "
-            if self.text["text"] == "0":  # If zero +=
-                if btn_id == ".":
-                    self.text["text"] += btn_id
-                elif btn_id in x:
-                    return
-                else:
-                    self.text["text"] = btn_id
+            return
 
-            elif "a" in dict2:  # if equal to +=
-                if btn_id in x:
+        x = " * ", "\u00B2", " / ", " % ", ".", " ^ ", "√ ", " + ", " - "
+
+        if self.text["text"] == "0":  # Adding to Zero 0
+            if btn_id in x:
+                return
+
+            self.set_text(self.text, btn_id, btn_id == ".")
+        elif self.equal:
+            self.set_text(self.text, btn_id, btn_id in x)
+            self.equal = False
+        else:
+            if btn_id in x:
+                self.change_symbols(btn_id)
+                return
+            
+            x = "+", "-", "*", "\u00B2", "/", "%", "^", ".", "√"
+            l1 = self.text["text"]
+            l2 = l1.replace(" ", "")
+            length = len(l2)
+            last_char = l2[length - 1]
+            if last_char in x:
+                self.text["text"] += btn_id
+            elif last_char == ")":
+                if btn_id not in x:
+                    self.text["text"] += " * " + btn_id
+                else:
                     self.text["text"] += btn_id
-                    if "a" in dict2:
-                        del dict2["a"]
-                else:
-                    self.text["text"] = btn_id
-                    if "a" in dict2:
-                        del dict2["a"]
             else:
-                if btn_id in x:
-                    self.change(btn_id)
-                else:
-                    x = "+", "-", "*", "\u00B2", "/", "%", "^", ".", "√"
-                    l1 = self.text["text"]
-                    l2 = l1.replace(" ", "")
-                    length = len(l2)
-                    last_char = l2[length - 1]
-                    if last_char in x:
-                        self.text["text"] += btn_id
-                    elif last_char == ")":
-                        if btn_id not in x:
-                            self.text["text"] += " * " + btn_id
-                        else:
-                            self.text["text"] += btn_id
-                    else:
-                        self.text["text"] += btn_id
-                    if "a" in dict3:
-                        del dict3["a"]
+                self.text["text"] += btn_id
 
 
 if __name__ == "__main__":
@@ -385,11 +375,11 @@ if __name__ == "__main__":
 
     calc = Calculator(master=root)
     calc.configure(bg="black")
-    calc.bind("<Delete>", calc.delete)
-    calc.bind("<(>", calc.bracket)
-    calc.bind("<)>", calc.bracket)
+    calc.bind("<Delete>", calc.all_clear)
+    calc.bind("<(>", calc.bracket_down)
+    calc.bind("<)>", calc.bracket_down)
     calc.bind("<KeyPress>", calc.key_up)
-    calc.bind("<BackSpace>", calc.backspace_down)
+    calc.bind("<BackSpace>", calc.backspace)
     calc.bind("<Return>", calc.enter_down)
     calc.focus_set()
     calc.mainloop()
