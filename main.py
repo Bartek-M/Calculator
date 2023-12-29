@@ -11,18 +11,18 @@ dict4 = {}  # Color Choose
 
 class Calculator(tk.Frame):
     BG_DEFAULT = [
-        "#000000",
-        "#000000", 
-        "#000000", 
-        "#000000",
-        "#000000", 
-        "#000000",
-        "#000000",
-        "#000000",
-        "#000000",
-        "#000000",
-        "#000000",
-        "#000000",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
+        "#101010",
         "#202020",
         "#202020",
         "#202020",
@@ -67,10 +67,6 @@ class Calculator(tk.Frame):
         "#FFFFFF",
     ]
 
-    FONT_S = font.Font(size=10)
-    FONT_M = font.Font(size=12)
-    FONT_L = font.Font(size=28)
-
     def __init__(self, master):
         super().__init__(master)
         self.colors = self.load_colors()
@@ -82,14 +78,18 @@ class Calculator(tk.Frame):
         colors = {"bg": self.BG_DEFAULT, "fg": self.FG_DEFAULT}
 
         try:
-            if reset: raise
+            if reset:
+                raise
 
             with open("./config.json", "r", encoding="UTF-8") as f:
                 data = json.load(f)
 
-            if not data.get("bg") or not data.get("fg"): raise
-            if len(data["bg"]) != len(self.BG_DEFAULT) or len(data["fg"]) != len(self.FG_DEFAULT): raise
-            if [c for c in data["bg"] if len(c) != 7] or [c for c in data["fg"] if len(c) != 7]: raise
+            if not data.get("bg") or not data.get("fg"):
+                raise
+            if len(data["bg"]) != len(self.BG_DEFAULT) or len(data["fg"]) != len(self.FG_DEFAULT):
+                raise
+            if [c for c in data["bg"] if len(c) != 7] or [c for c in data["fg"] if len(c) != 7]:
+                raise
 
             return data
         except:
@@ -99,6 +99,10 @@ class Calculator(tk.Frame):
         return colors
 
     def create_widget(self):
+        FONT_S = font.Font(size=10)
+        FONT_M = font.Font(size=12)
+        FONT_L = font.Font(size=28)
+
         a = 2
         b = 6
         c = 7
@@ -108,73 +112,164 @@ class Calculator(tk.Frame):
         self.grid(column=2, sticky="NESW")
         self.grid(column=3, sticky="NESW")
 
-        self.columnconfigure(0, pad=2)
-        self.columnconfigure(1, pad=2)
-        self.columnconfigure(2, pad=2)
-        self.columnconfigure(3, pad=2)
+        self.columnconfigure(0, pad=1)
+        self.columnconfigure(1, pad=1)
+        self.columnconfigure(2, pad=1)
+        self.columnconfigure(3)
 
-        self.rowconfigure(2, pad=2)
-        self.rowconfigure(3, pad=2)
-        self.rowconfigure(4, pad=2)
-        self.rowconfigure(5, pad=2)
-        self.rowconfigure(6, pad=2)
-        self.rowconfigure(7, pad=2)
+        self.rowconfigure(2, pad=1)
+        self.rowconfigure(3, pad=1)
+        self.rowconfigure(4, pad=1)
+        self.rowconfigure(5, pad=1)
+        self.rowconfigure(6, pad=1)
+        self.rowconfigure(7)
 
-        self.text = tk.Label(self, text="0", height=2, width=12, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
-        self.text.grid(row=1, columnspan=4, sticky="")
-        self.text["font"] = self.myFontt1
+        self.text = tk.Label(self, text="0", height=2, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
+        self.text.grid(row=1, columnspan=4, sticky="we")
+        self.text["font"] = FONT_L
 
-        self.text2 = tk.Label(self, text="", height=1, width=33, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
-        self.text2.grid(row=0, columnspan=4, sticky="")
-        self.text2["font"] = self.myFontt2
+        self.text2 = tk.Label(self, text="", height=1, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
+        self.text2.grid(row=0, columnspan=4, sticky="we")
+        self.text2["font"] = FONT_S
 
         self.btnN = tk.Button(
-            self, text="( )", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][10], fg=self.colors["fg"][10], command=lambda: self.click("( )")
+            self,
+            text="( )",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][10],
+            fg=self.colors["fg"][10],
+            command=lambda: self.click("( )"),
         ).grid(row=7, column=0, sticky="")
         self.btn0 = tk.Button(
-            self, text="0", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][0], fg=self.colors["fg"][0], command=lambda: self.click("0")
+            self,
+            text="0",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][0],
+            fg=self.colors["fg"][0],
+            command=lambda: self.click("0"),
         ).grid(row=7, column=1, sticky="")
         self.btnK = tk.Button(
-            self, text=".", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][11], fg=self.colors["fg"][11], command=lambda: self.click(".")
+            self,
+            text=".",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][11],
+            fg=self.colors["fg"][11],
+            command=lambda: self.click("."),
         ).grid(row=7, column=2, sticky="")
 
         self.btn1 = tk.Button(
-            self, text="1", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][1], fg=self.colors["fg"][1], command=lambda: self.click("1")
+            self,
+            text="1",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][1],
+            fg=self.colors["fg"][1],
+            command=lambda: self.click("1"),
         ).grid(row=6, column=0, sticky="")
         self.btn2 = tk.Button(
-            self, text="2", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][2], fg=self.colors["fg"][2], command=lambda: self.click("2")
+            self,
+            text="2",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][2],
+            fg=self.colors["fg"][2],
+            command=lambda: self.click("2"),
         ).grid(row=6, column=1, sticky="")
         self.btn3 = tk.Button(
-            self, text="3", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][3], fg=self.colors["fg"][3], command=lambda: self.click("3")
+            self,
+            text="3",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][3],
+            fg=self.colors["fg"][3],
+            command=lambda: self.click("3"),
         ).grid(row=6, column=2, sticky="")
 
         self.btn4 = tk.Button(
-            self, text="4", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][4], fg=self.colors["fg"][4], command=lambda: self.click("4")
+            self,
+            text="4",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][4],
+            fg=self.colors["fg"][4],
+            command=lambda: self.click("4"),
         ).grid(row=5, column=0, sticky="")
         self.btn5 = tk.Button(
-            self, text="5", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][5], fg=self.colors["fg"][5], command=lambda: self.click("5")
+            self,
+            text="5",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][5],
+            fg=self.colors["fg"][5],
+            command=lambda: self.click("5"),
         ).grid(row=5, column=1, sticky="")
         self.btn6 = tk.Button(
-            self, text="6", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][6], fg=self.colors["fg"][6], command=lambda: self.click("6")
+            self,
+            text="6",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][6],
+            fg=self.colors["fg"][6],
+            command=lambda: self.click("6"),
         ).grid(row=5, column=2, sticky="")
 
         self.btn7 = tk.Button(
-            self, text="7", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][7], fg=self.colors["fg"][7], command=lambda: self.click("7")
+            self,
+            text="7",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][7],
+            fg=self.colors["fg"][7],
+            command=lambda: self.click("7"),
         ).grid(row=4, column=0, sticky="")
         self.btn8 = tk.Button(
-            self, text="8", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][8], fg=self.colors["fg"][8], command=lambda: self.click("8")
+            self,
+            text="8",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][8],
+            fg=self.colors["fg"][8],
+            command=lambda: self.click("8"),
         ).grid(row=4, column=1, sticky="")
         self.btn9 = tk.Button(
-            self, text="9", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][9], fg=self.colors["fg"][9], command=lambda: self.click("9")
+            self,
+            text="9",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][9],
+            fg=self.colors["fg"][9],
+            command=lambda: self.click("9"),
         ).grid(row=4, column=2, sticky="")
 
         self.btnPR = tk.Button(
-            self, text="%", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][12], fg=self.colors["fg"][12], command=lambda: self.click(" % ")
+            self,
+            text="%",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][12],
+            fg=self.colors["fg"][12],
+            command=lambda: self.click(" % "),
         ).grid(row=3, column=0, sticky="")
         self.btnM2 = tk.Button(
             self,
             text="x" "\u00B2",
-            font=self.myFont1,
+            font=FONT_M, bd=0,
             height=a,
             width=b,
             bg=self.colors["bg"][13],
@@ -182,36 +277,106 @@ class Calculator(tk.Frame):
             command=lambda: self.click("\u00B2"),
         ).grid(row=3, column=1, sticky="")
         self.btnMY = tk.Button(
-            self, text="xʸ", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][14], fg=self.colors["fg"][14], command=lambda: self.click(" ^ ")
+            self,
+            text="xʸ",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][14],
+            fg=self.colors["fg"][14],
+            command=lambda: self.click(" ^ "),
         ).grid(row=3, column=2, sticky="")
 
         self.btnAC = tk.Button(
-            self, text="AC", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][20], fg=self.colors["fg"][20], command=lambda: self.click(" ")
+            self,
+            text="AC",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][20],
+            fg=self.colors["fg"][20],
+            command=lambda: self.click(" "),
         ).grid(row=2, column=0, sticky="")
         self.btnPR = tk.Button(
-            self, text="√", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][21], fg=self.colors["fg"][21], command=lambda: self.click("√ ")
+            self,
+            text="√",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][21],
+            fg=self.colors["fg"][21],
+            command=lambda: self.click("√ "),
         ).grid(row=2, column=1, sticky="")
         self.btnPI = tk.Button(
-            self, text="π", font=self.myFont1, height=a, width=b, bg=self.colors["bg"][22], fg=self.colors["fg"][22], command=lambda: self.click("3.14")
+            self,
+            text="π",
+            font=FONT_M, bd=0,
+            height=a,
+            width=b,
+            bg=self.colors["bg"][22],
+            fg=self.colors["fg"][22],
+            command=lambda: self.click("3.14"),
         ).grid(row=2, column=2, sticky="")
 
         self.btnP = tk.Button(
-            self, text="+", font=self.myFont1, height=a, width=c, bg=self.colors["bg"][15], fg=self.colors["fg"][15], command=lambda: self.click(" + ")
+            self,
+            text="+",
+            font=FONT_M, bd=0,
+            height=a,
+            width=c,
+            bg=self.colors["bg"][15],
+            fg=self.colors["fg"][15],
+            command=lambda: self.click(" + "),
         ).grid(row=6, column=3, sticky="")
         self.btnE = tk.Button(
-            self, text="=", font=self.myFont1, height=a, width=c, bg=self.colors["bg"][25], fg=self.colors["fg"][25], command=lambda: self.click("=")
+            self,
+            text="=",
+            font=FONT_M, bd=0,
+            height=a,
+            width=c,
+            bg=self.colors["bg"][25],
+            fg=self.colors["fg"][25],
+            command=lambda: self.click("="),
         ).grid(row=7, column=3, sticky="")
         self.btnM = tk.Button(
-            self, text="-", font=self.myFont1, height=a, width=c, bg=self.colors["bg"][16], fg=self.colors["fg"][16], command=lambda: self.click(" - ")
+            self,
+            text="-",
+            font=FONT_M, bd=0,
+            height=a,
+            width=c,
+            bg=self.colors["bg"][16],
+            fg=self.colors["fg"][16],
+            command=lambda: self.click(" - "),
         ).grid(row=5, column=3, sticky="")
         self.btnX = tk.Button(
-            self, text="x", font=self.myFont1, height=a, width=c, bg=self.colors["bg"][17], fg=self.colors["fg"][17], command=lambda: self.click(" * ")
+            self,
+            text="x",
+            font=FONT_M, bd=0,
+            height=a,
+            width=c,
+            bg=self.colors["bg"][17],
+            fg=self.colors["fg"][17],
+            command=lambda: self.click(" * "),
         ).grid(row=4, column=3, sticky="")
         self.btnC = tk.Button(
-            self, text="\u232B", font=self.myFont1, height=a, width=c, bg=self.colors["bg"][18], fg=self.colors["fg"][18], command=lambda: self.click("B")
+            self,
+            text="\u232B",
+            font=FONT_M, bd=0,
+            height=a,
+            width=c,
+            bg=self.colors["bg"][18],
+            fg=self.colors["fg"][18],
+            command=lambda: self.click("B"),
         ).grid(row=2, column=3, sticky="")
         self.btnD = tk.Button(
-            self, text="/", font=self.myFont1, height=a, width=c, bg=self.colors["bg"][19], fg=self.colors["fg"][19], command=lambda: self.click(" / ")
+            self,
+            text="/",
+            font=FONT_M, bd=0,
+            height=a,
+            width=c,
+            bg=self.colors["bg"][19],
+            fg=self.colors["fg"][19],
+            command=lambda: self.click(" / "),
         ).grid(row=3, column=3, sticky="")
 
     def enter_down(self, _):
@@ -232,7 +397,7 @@ class Calculator(tk.Frame):
 
         self.click(char)
 
-        elif e.char == "c":
+        if e.char == "c":
             if "c" in dict4:
                 del dict4["c"]
             if "a" in dict4:
