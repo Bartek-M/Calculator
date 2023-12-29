@@ -317,30 +317,22 @@ class Calculator(tk.Frame):
             return self.backspace()
 
         if btn_id == "( )":
-            x = "+", "-", "*", "\u00B2", "/", "%", "^"
-
-            if "a" in dict1:
-                self.text["text"] += ")"
-                del dict1["a"]
+            if self.brackets:
+                self.set_text(self.text, ")", True)
+                self.brackets = False
+                return
+            
+            if self.text["text"] == "0":
+                self.set_text(self.text, "(")
             else:
-                if self.text["text"] == "0":
-                    self.text["text"] = "("
-                else:
-                    l1 = self.text["text"]
-                    l2 = l1.replace(" ", "")
-                    length = len(l2)
-                    last_char = l2[length - 1]
-                    if last_char in x:
-                        self.text["text"] += "("
-                    else:
-                        self.text["text"] += " * ("
-                dict1["a"] = "b"
-                if "a" in dict2:
-                    del dict2["a"]
+                last_char = self.text["text"][-1 if self.text["text"][-1] != " " else -2]
+                self.set_text(self.text, "(" if last_char in self.SYMBOLS else " * (", True)
 
+            self.brackets = True
+            self.equal = False
             return
 
-        if self.text["text"] == "0":  # Adding to Zero 0
+        if self.text["text"] == "0": 
             if temp_id in self.SYMBOLS and temp_id != ".":
                 return
 
