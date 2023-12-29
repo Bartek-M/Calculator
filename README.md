@@ -4,7 +4,7 @@ Simple **Calculator** written in **Python** with **Tkinter**. This was my first 
 > Check it out and make you calculations easier
 
 ## Requirements 
-- Python 3.8 or above
+- Python 3.9 or above
 
 ## Functions
 - settings are stored in config files
