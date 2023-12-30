@@ -151,10 +151,10 @@ class Calculator(tk.Frame):
         self.rowconfigure(6, pad=1)
         self.rowconfigure(7)
 
-        self.label = tk.Label(self, text="0", font=FONT_L, height=self.HEIGHT, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
+        self.label = tk.Label(self, text="0", font=FONT_L, height=self.HEIGHT, width=13, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
         self.label.grid(row=1, columnspan=4, sticky="we")
 
-        self.label_2 = tk.Label(self, text="", font=FONT_S, height=1, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
+        self.label_2 = tk.Label(self, text="", font=FONT_S, height=1, width=30, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
         self.label_2.grid(row=0, columnspan=4, sticky="we")
 
         tk.Button(self, text="( )", **DEFAULT_BTN(10), command=lambda: self.click("( )")).grid(row=7, column=0)
@@ -253,7 +253,7 @@ class Calculator(tk.Frame):
 
     def backspace(self, _=None):
         last_char = self.label["text"][-1]
-        self.set_text(self.label["text"], self.label["text"][: -3 if last_char == " " else -1])
+        self.set_text(self.label, self.label["text"][: -3 if last_char == " " else -1])
 
         if self.label["text"] == "":  # Never blank label text
             self.set_text(self.label, "0")
@@ -319,7 +319,7 @@ class Calculator(tk.Frame):
 
             self.set_text(self.label, btn_id, btn_id == ".")
         elif self.equal:
-            self.set_text(self.label, btn_id, btn_id in self.SYMBOLS)
+            self.set_text(self.label, btn_id, temp_id in self.SYMBOLS)
             self.equal = False
         else:
             if temp_id in self.SYMBOLS:
