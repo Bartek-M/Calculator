@@ -151,7 +151,7 @@ class Calculator(tk.Frame):
         self.rowconfigure(6, pad=1)
         self.rowconfigure(7)
 
-        self.label = tk.Label(self, text="0", font=FONT_L, height=self.HEIGHT, width=13, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
+        self.label = tk.Label(self, text="0", font=FONT_L, height=self.HEIGHT, width=12, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
         self.label.grid(row=1, columnspan=4, sticky="we")
 
         self.label_2 = tk.Label(self, text="", font=FONT_S, height=1, width=30, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
@@ -343,7 +343,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("Calculator")
     root.resizable(False, False)
-    root.iconbitmap("favicon.ico")
+    root.iconphoto(False, tk.PhotoImage(file="./favicon.png"))
 
     calc = Calculator(master=root)
     calc.configure(bg="black")
