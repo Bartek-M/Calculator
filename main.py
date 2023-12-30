@@ -66,8 +66,6 @@ class Calculator(tk.Frame):
     WIDTH = 6
     WIDTH_2 = 7
 
-    MAX_LENGTH = 13
-
     SYMBOLS = {
         "( )": 10,
         ".": 11,
@@ -133,6 +131,7 @@ class Calculator(tk.Frame):
             "fg": self.colors["fg"][x],
             "activebackground": self.colors["bg"][x],
             "activeforeground": self.colors["fg"][x],
+            "cursor": "hand2",
         }
 
         self.grid(column=0, sticky="NESW")
@@ -152,11 +151,11 @@ class Calculator(tk.Frame):
         self.rowconfigure(6, pad=1)
         self.rowconfigure(7)
 
-        self.text = tk.Label(self, text="0", font=FONT_L, height=self.HEIGHT, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
-        self.text.grid(row=1, columnspan=4, sticky="we")
+        self.label = tk.Label(self, text="0", font=FONT_L, height=self.HEIGHT, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
+        self.label.grid(row=1, columnspan=4, sticky="we")
 
-        self.text_2 = tk.Label(self, text="", font=FONT_S, height=1, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
-        self.text_2.grid(row=0, columnspan=4, sticky="we")
+        self.label_2 = tk.Label(self, text="", font=FONT_S, height=1, bg=self.colors["bg"][24], fg=self.colors["fg"][24], anchor="e")
+        self.label_2.grid(row=0, columnspan=4, sticky="we")
 
         tk.Button(self, text="( )", **DEFAULT_BTN(10), command=lambda: self.click("( )")).grid(row=7, column=0)
         tk.Button(self, text="0", **DEFAULT_BTN(0), command=lambda: self.click("0")).grid(row=7, column=1)
@@ -190,30 +189,28 @@ class Calculator(tk.Frame):
         tk.Button(self, text="\u232B", **DEFAULT_BTN(19) | {"width": self.WIDTH_2}, command=lambda: self.click("B")).grid(row=2, column=3)
 
     def set_text(self, label, text="", add: bool = False):
-        if len(text) > self.MAX_LENGTH or (add and (len(label["text"]) + len(text) > self.MAX_LENGTH)):
-            return
-
         if add:
             label["text"] += text
         else:
+            self.label_2["text"] = ""
             label["text"] = text
 
     def key_up(self, e):
         match char := e.char, self.config:
             case ("c", None) | ("f", "fg"):
                 self.config = "bg"
-                self.set_text(self.text, "BG Setup")
+                self.set_text(self.label, "BG Setup")
             case "c", _:
                 self.config = None
-                self.set_text(self.text, "0")
+                self.set_text(self.label, "0")
             case "f", "bg":
                 self.config = "fg"
-                self.set_text(self.text, "FG Setup")
+                self.set_text(self.label, "FG Setup")
 
             case "d", "bg" | "fg":
                 self.colors = self.load_colors(set=True)
                 self.create_widget()
-                self.set_text(self.text, "BG Setup" if self.config == "bg" else "FG Setup")
+                self.set_text(self.label, "BG Setup" if self.config == "bg" else "FG Setup")
 
             case "+" | "-" | "*" | "/" | "%" | "^", _:
                 char = f" {char} "
@@ -234,8 +231,7 @@ class Calculator(tk.Frame):
         self.click("( )")
 
     def all_clear(self, _=None):
-        self.set_text(self.text, "0")
-        self.set_text(self.text_2)
+        self.set_text(self.label, "0")
 
         self.brackets = False
         self.equal = False
@@ -243,24 +239,24 @@ class Calculator(tk.Frame):
     def equal_to(self):
         if self.brackets:
             return
-
-        self.text_2["text"] = f"{self.text['text']} ="
+        
+        calc_expr = self.label["text"]
 
         try:
-            expr = self.text["text"].replace("\u00B2", "**2").replace(" % ", "/100").replace(" ^ ", "**").replace("√ ", "**0.5")
-            self.text["text"] = str(round(eval(expr), 4))
+            expr = calc_expr.replace("\u00B2", "**2").replace(" % ", "/100").replace(" ^ ", "**").replace("√ ", "**0.5")
+            self.set_text(self.label, str(round(eval(expr), 4)))
         except (ZeroDivisionError, SyntaxError, TypeError, IndexError, UnboundLocalError):
-            self.text["text"] = "ERROR"
+            self.set_text(self.label, "ERROR")
 
+        self.set_text(self.label_2, f"{calc_expr} =")
         self.equal = True
 
     def backspace(self, _=None):
-        last_char = self.text["text"][-1]
-        self.text["text"] = self.text["text"][: -3 if last_char == " " else -1]
+        last_char = self.label["text"][-1]
+        self.set_text(self.label["text"], self.label["text"][: -3 if last_char == " " else -1])
 
-        if self.text["text"] == "":  # Never blank label text
-            self.set_text(self.text, "0")
-            self.set_text(self.text_2)
+        if self.label["text"] == "":  # Never blank label text
+            self.set_text(self.label, "0")
 
         if last_char in ["(", ")"]:
             self.brackets = False
@@ -281,7 +277,7 @@ class Calculator(tk.Frame):
         self.colors[self.config].insert(btn_id, color)
 
         self.create_widget()
-        self.set_text(self.text, "BG Setup" if self.config == "bg" else "FG Setup")
+        self.set_text(self.label, "BG Setup" if self.config == "bg" else "FG Setup")
 
         self.load_colors(self.colors, True)
 
@@ -291,7 +287,7 @@ class Calculator(tk.Frame):
         if self.config in ["bg", "fg"]:
             return self.change_color(temp_id)
 
-        if self.text["text"] == "ERROR" and btn_id != "AC":
+        if self.label["text"] == "ERROR" and btn_id != "AC":
             return
 
         if btn_id == "AC":
@@ -303,44 +299,44 @@ class Calculator(tk.Frame):
 
         if btn_id == "( )":
             if self.brackets:
-                self.set_text(self.text, ")", True)
+                self.set_text(self.label, ")", True)
                 self.brackets = False
                 return
-            
-            if self.text["text"] == "0":
-                self.set_text(self.text, "(")
+
+            if self.label["text"] == "0":
+                self.set_text(self.label, "(")
             else:
-                last_char = self.text["text"][-1 if self.text["text"][-1] != " " else -2]
-                self.set_text(self.text, "(" if last_char in self.SYMBOLS else " * (", True)
+                last_char = self.label["text"][-1 if self.label["text"][-1] != " " else -2]
+                self.set_text(self.label, "(" if last_char in self.SYMBOLS else " * (", True)
 
             self.brackets = True
             self.equal = False
             return
 
-        if self.text["text"] == "0": 
+        if self.label["text"] == "0":
             if temp_id in self.SYMBOLS and temp_id != ".":
                 return
 
-            self.set_text(self.text, btn_id, btn_id == ".")
+            self.set_text(self.label, btn_id, btn_id == ".")
         elif self.equal:
-            self.set_text(self.text, btn_id, btn_id in self.SYMBOLS)
+            self.set_text(self.label, btn_id, btn_id in self.SYMBOLS)
             self.equal = False
         else:
             if temp_id in self.SYMBOLS:
-                last_char = self.text["text"][-1 if self.text["text"][-1] != " " else -2]
+                last_char = self.label["text"][-1 if self.label["text"][-1] != " " else -2]
                 new_text, add = btn_id, True
-                
-                if last_char in ["\u00B2", "√"]:
-                    new_text, add = self.text["text"][:-2] + btn_id, False
-                elif last_char in self.SYMBOLS:
-                    new_text, add = self.text["text"][:-3] + btn_id, False
 
-                return self.set_text(self.text, new_text, add)
-            
-            if self.text["text"][-1] == ")" and btn_id not in self.SYMBOLS:
-                return self.set_text(self.text, f" * {btn_id}", True)
-            
-            self.set_text(self.text, btn_id, True)
+                if last_char in ["\u00B2", "√"]:
+                    new_text, add = self.label["text"][:-2] + btn_id, False
+                elif last_char in self.SYMBOLS:
+                    new_text, add = self.label["text"][:-3] + btn_id, False
+
+                return self.set_text(self.label, new_text, add)
+
+            if self.label["text"][-1] == ")" and btn_id not in self.SYMBOLS:
+                return self.set_text(self.label, f" * {btn_id}", True)
+
+            self.set_text(self.label, btn_id, True)
 
 
 if __name__ == "__main__":

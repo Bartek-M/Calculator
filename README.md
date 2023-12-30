@@ -1,5 +1,5 @@
 # Calculator
-Simple **Calculator** written in **Python** with **TKinter**. This was my first major project. I created it in 2017 and made some improvements in 2023.
+Simple **Calculator** written in **Python** with **TKinter**. This was my first major project. I created it in 2018 and made some improvements in 2023.
 
 > Check it out and make you calculations easier
 
