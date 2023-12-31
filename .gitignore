@@ -1,2 +1,4 @@
-config.json
+build/
 dist/
+config.json
+.spec

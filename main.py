@@ -343,7 +343,11 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("Calculator")
     root.resizable(False, False)
-    root.iconbitmap("favicon.ico")
+
+    try:
+        root.iconbitmap("favicon.ico")
+    except:
+        print("Couldn't load icon")
 
     calc = Calculator(master=root)
     calc.configure(bg="black")
