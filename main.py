@@ -343,7 +343,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("Calculator")
     root.resizable(False, False)
-    root.iconphoto(False, tk.PhotoImage(file="./favicon.png"))
+    root.iconbitmap("favicon.ico")
 
     calc = Calculator(master=root)
     calc.configure(bg="black")
